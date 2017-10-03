@@ -9,11 +9,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using WebSocket4Net;
-using static DataManager.JsonRESTObjects;
-using static DataManager.JsonSocketObjects;
-using static DataManager.GlobalVars;
+using static Interface.JsonRESTObjects;
+using static Interface.JsonSocketObjects;
+using static Interface.GlobalVars;
 
-namespace DataManager
+namespace Interface
 {
     public partial class AsyncSocketServer
     {
@@ -37,7 +37,7 @@ namespace DataManager
         public static void Start()
         {            
             // Creates an implementation of the Rest interface
-            api = RestClient.For<IAcaciaApi>(RestURL);
+            api = RestClient.For<IAcaciaApi>(restURL);
 
             clientList  = new ArrayList();
             try

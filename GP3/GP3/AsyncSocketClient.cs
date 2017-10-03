@@ -2,11 +2,13 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace GP3
 {
     class AsyncSocketClient
     {
+        static ManualResetEvent resetEvent = new ManualResetEvent(false);
         static ProcessGaze processGaze;
         // Client socket.  
         public static Socket client;
@@ -43,7 +45,8 @@ namespace GP3
                                     new AsyncCallback(OnReceive),
                                     null);
 
-                while (GlobalVars.Running) { }
+                resetEvent.WaitOne();
+                //while (GlobalVars.Running) { }
 
                 // Release the socket.  
                 client.Shutdown(SocketShutdown.Both);
@@ -114,6 +117,7 @@ namespace GP3
                 {
                     processGaze.Disconnect();
                     GlobalVars.Running = false;
+                    resetEvent.Set();
                     System.Environment.Exit(1);
                 }
 

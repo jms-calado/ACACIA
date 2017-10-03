@@ -169,7 +169,7 @@ namespace Affectiva
         
         StreamWriter file = null;
         //string FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Apoya\Records" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
 
         public static double ConvertToUnixTimestamp(DateTime date)
         {

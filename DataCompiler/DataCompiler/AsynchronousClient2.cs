@@ -13,6 +13,7 @@ namespace DataCompiler
 {    
     public class AsynchronousClient2
     {
+        static ManualResetEvent resetEvent = new ManualResetEvent(false);
         // Client socket.  
         //public static Socket client;
 
@@ -58,7 +59,8 @@ namespace DataCompiler
                                            new AsyncCallback(OnReceive),
                                            null);
 
-                while (GlobalVars.Running) { }
+                resetEvent.WaitOne();
+                //while (GlobalVars.Running) { }
                 /*{
                     // Send test data to the remote device.  
                     Send(client, "This is a test<EOF>");
@@ -135,7 +137,8 @@ namespace DataCompiler
                 }
                 else if (msgReceived.Equals("Off"))
                 {
-                    GlobalVars.Running = true;
+                    //GlobalVars.Running = true;
+                    resetEvent.Set();
                     System.Environment.Exit(1);
                 }
 

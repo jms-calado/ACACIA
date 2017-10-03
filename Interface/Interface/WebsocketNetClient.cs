@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebSocket4Net;
-using static DataManager.JsonSocketObjects;
-using static DataManager.GlobalVars;
+using static Interface.JsonSocketObjects;
+using static Interface.GlobalVars;
 using System.Diagnostics;
 using System.Threading;
 
-namespace DataManager
+namespace Interface
 {
     class WebsocketNetClient
     {
@@ -22,10 +22,6 @@ namespace DataManager
         private string url;
         private string protocol;
         private WebSocketVersion version;
-        public class WSstate
-        {
-            public static bool connected = false;
-        }
         public void Setup(string url, string protocol, WebSocketVersion version)
         {
             this.url = url;
@@ -46,13 +42,6 @@ namespace DataManager
             websocketClient.Open();
             //wait for ws connection established
             resumeEvent.WaitOne();
-            //while (WSstate.connected == false) { }
-            //Start TCP socket
-            Task.Run(() => AsyncSocketServer.Start());
-
-            //wait for program termination
-            resetEvent.WaitOne();
-            //while (WSstate.connected == true) { }
         }
         public void Stop()
         {
@@ -68,27 +57,7 @@ namespace DataManager
         private void WebsocketClient_Opened(object sender, EventArgs e)
         {
             Console.WriteLine("Client successfully connected.");
-            Sensor sensor = new Sensor()
-            {
-                action = "add",
-                name = "username",
-                type = "Student",
-                sensors = new string[] { "GP3", "Affectiva" },
-                statusOnOff = "Off",
-                statusStartStop = "Stop"
-            };
-            string message = JsonConvert.SerializeObject(sensor,
-                                        Newtonsoft.Json.Formatting.None,
-                                        new JsonSerializerSettings
-                                        {
-                                            NullValueHandling = NullValueHandling.Ignore,
-                                            MissingMemberHandling = MissingMemberHandling.Ignore
-                                        });
-            websocketClient.Send(message);
-            Console.WriteLine("Message Sent: " + message);
             resumeEvent.Set();
-            //WSstate.connected = true;            
-            new LoginForm().ShowDialog();
         }
         private void WebsocketClient_Closed(object sender, EventArgs e)
         {
@@ -107,7 +76,7 @@ namespace DataManager
             Console.WriteLine("Message Received: " + e.Message);
 
             JObject jObject = JObject.Parse(e.Message);
-            if ("onoff".Equals(jObject.SelectToken("action").ToString()))
+            if ("toggleOnOff".Equals(jObject.SelectToken("action").ToString()))
             {
                 if ("On".Equals(jObject.SelectToken("statusOnOff").ToString()))
                 {
@@ -115,15 +84,7 @@ namespace DataManager
                     scenario = jObject.SelectToken("scenario").ToString();
                     sample_rate = jObject.SelectToken("sample_rate").ToString();
                     sensory_components = jObject.SelectToken("sensory_components").ToObject<string[]>();
-
-                    //new LoginForm().ShowDialog();
-                    /*
-                    foreach(string proc_name in sensory_components)
-                    {
-                        StartProc(proc_name);
-
-                    }*/
-
+                    
                     Sensor sensor = new Sensor()
                     {
                         action = "toggleOnOff",
@@ -166,7 +127,7 @@ namespace DataManager
                     Console.WriteLine("Message Sent: " + message);
                 }
             }
-            else if ("startstop".Equals(jObject.SelectToken("action").ToString()))
+            else if ("toggleStartStop".Equals(jObject.SelectToken("action").ToString()))
             {
                 if ("Start".Equals(jObject.SelectToken("statusStartStop").ToString()))
                 {
@@ -216,40 +177,6 @@ namespace DataManager
                 Console.WriteLine(e.Exception.InnerException.GetType());
             }
             return;
-        }
-        private bool StartProc(string proc_name)
-        {
-            if (!Process.GetProcesses().Any(p => p.ProcessName.Contains(proc_name)))
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = proc_name + ".exe";
-                process.StartInfo.Arguments = "-p " + tcpSocketPort.ToString();
-                process.EnableRaisingEvents = true;
-                process.Start();
-                process.Exited += (sd, ea) => { };
-                return true;
-            }
-            else return false;
-        }
-        private bool KillProc(string proc_name)
-        {
-            if (Process.GetProcesses().Any(p => p.ProcessName.Contains(proc_name)))
-            {
-                try
-                {
-                    foreach (Process proc in Process.GetProcessesByName(proc_name))
-                    {
-                        proc.Kill();
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                return false;
-            }
-            else return false;
         }
     }
 }

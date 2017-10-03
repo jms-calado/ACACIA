@@ -29,7 +29,7 @@ namespace GP3
 
         StreamWriter file = null;
         //string FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Apoya\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
         
         public ProcessGaze()
         {
@@ -135,7 +135,7 @@ namespace GP3
                                 file.WriteLine("</root>");
                                 file.Dispose();//?
                                 //FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "\\Records\\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-                                FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Apoya\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                                FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                                 Console.WriteLine("New file: " + FilePath);
                                 file = new StreamWriter(FilePath, true);
                                 file.AutoFlush = true;

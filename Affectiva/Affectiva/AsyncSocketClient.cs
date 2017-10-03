@@ -2,11 +2,13 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Affectiva
 {
     class AsyncSocketClient
     {
+        static ManualResetEvent resetEvent = new ManualResetEvent(false);
         static ProcessVideo videoProcess;
         // Client socket.  
         public static Socket client;
@@ -43,7 +45,8 @@ namespace Affectiva
                                     new AsyncCallback(OnReceive),
                                     null);
 
-                while (GlobalVars.Running) { }
+                resetEvent.WaitOne();
+                //while (GlobalVars.Running) { }
 
                 // Release the socket.  
                 client.Shutdown(SocketShutdown.Both);
@@ -108,6 +111,7 @@ namespace Affectiva
                 else if (msgReceived.Equals("Stop"))
                 {
                     videoProcess.Stop();
+                    resetEvent.Set();
                     //System.Windows.Forms.Application.Exit();
                 }
                 else if (msgReceived.Equals("Off"))

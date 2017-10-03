@@ -46,7 +46,7 @@ namespace DataCompiler
                 }
             }
 
-            GlobalVars.Running = true;
+            //GlobalVars.Running = true;
             //Task.Run(() => AsynchronousClient2.StartClient(port));
             AsynchronousClient2.StartClient(port);
             /*Application.EnableVisualStyles();

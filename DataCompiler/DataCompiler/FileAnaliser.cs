@@ -20,15 +20,7 @@ namespace DataCompiler
         int Sample_count = 0;
         bool run_1 = true;//first run reading xml first REC
         XmlReader xmlfilereader;
-
-        //StreamWriter report = new StreamWriter(Directory.GetParent(Directory.GetCurrentDirectory()).FullName + "\\Reports\\Report.txt", true);
-        string filepath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName + "\\Reports\\Report.txt";
-
-        //string WatcherFolder = Directory.GetParent(Directory.GetCurrentDirectory()).FullName + "\\Records";
-        string WatcherFolder = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Apoya\Records";
-        string selected_file = string.Empty;
-
-
+        
         private void FileAnalizer(string path, string filename)
         {
             string data = string.Empty;
@@ -359,7 +351,7 @@ namespace DataCompiler
             Anger = Contempt = Disgust = Fear = Joy = Sadness = Surprise = Engagement = 0;
             Attention = Blink = Lpupil = Rpupil = FixDur = 0;
             Attention_Result = starting_time = Duration = 0;
-
+#if DEBUG
             //write report 
             /*
             report.AutoFlush = true;
@@ -369,6 +361,7 @@ namespace DataCompiler
             {
                 report.Write(data);
             }
+#endif
 
             // Send test data to the remote device.
             /*

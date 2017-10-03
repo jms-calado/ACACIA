@@ -47,7 +47,7 @@ namespace Affectiva
             }
             GlobalVars.Running = true;
             AsyncSocketClient.StartClient(port);
-            while (true) { }
+            //while (true) { }
             /*Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());*/
