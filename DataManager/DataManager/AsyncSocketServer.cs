@@ -12,6 +12,7 @@ using WebSocket4Net;
 using static DataManager.JsonRESTObjects;
 using static DataManager.JsonSocketObjects;
 using static DataManager.GlobalVars;
+using System.Globalization;
 
 namespace DataManager
 {
@@ -35,9 +36,24 @@ namespace DataManager
         
         public static IAcaciaApi api;
         public static void Start()
-        {            
+        {
             // Creates an implementation of the Rest interface
-            api = RestClient.For<IAcaciaApi>(RestURL);
+            var settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                Formatting = Formatting.None,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                //DateFormatString = "yyyy-MM-ddTHH:mm:ss",
+                DateParseHandling = DateParseHandling.None,
+                Culture = CultureInfo.InvariantCulture
+            };
+
+            api = new RestClient(RestURL)
+            {
+                JsonSerializerSettings = settings
+                //RequestBodySerializer = settings
+            }.For<IAcaciaApi>();
 
             clientList  = new ArrayList();
             try
@@ -91,7 +107,15 @@ namespace DataManager
                 string msgReceived = Encoding.ASCII.GetString(byteData).TrimEnd('\0');
                 byteData = new byte[1024];
 
-                JObject jObject = JObject.Parse(msgReceived);
+                JObject jObject = new JObject();
+                try
+                {
+                    jObject = JObject.Parse(msgReceived);
+                }
+                catch (JsonReaderException err)
+                {
+                    Console.WriteLine("Failed parsing tcp json: {0}", err);
+                }
                 if (jObject["Login"] != null)
                 {
                     //jObject.SelectTokens("Login").
@@ -132,6 +156,11 @@ namespace DataManager
                     if ( jObject["Message"]["Observation"] != null)
                     {
                         restMessage = (JObject)jObject.SelectToken("Message.Observation");
+                        /*JsonSerializer obsSerializer = new JsonSerializer();
+                        //obsSerializer.DateFormatString = "yyyy-MM-ddTHH:mm:ss";
+                        //obsSerializer.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                        obsSerializer.DateParseHandling = DateParseHandling.None;
+                        ObservationObject observationObject = restMessage.ToObject<ObservationObject>(obsSerializer);*/
                         ObservationObject observationObject = restMessage.ToObject<ObservationObject>();
                         observationObject.Scenario = scenario;
                         observationObject.Session = session;
@@ -156,15 +185,25 @@ namespace DataManager
                         restMessage = (JObject)jObject.SelectToken("Message.Affect");
                         AffectObject affectObject = restMessage.ToObject<AffectObject>();
                         affectObject.ObservationID = observation_ID;
-                        string message = JsonConvert.SerializeObject(affectObject,
+                        /*string message = JsonConvert.SerializeObject(affectObject,
                                                     Newtonsoft.Json.Formatting.None,
                                                     new JsonSerializerSettings
                                                     {
                                                         NullValueHandling = NullValueHandling.Ignore,
                                                         MissingMemberHandling = MissingMemberHandling.Ignore
                                                     });
-
-                        var response = api.PostAffect(message).Result;
+                        var response = api.PostAffect(message).Result;*/
+                        foreach (var propertyInfo in affectObject.GetType().GetProperties())
+                        {
+                            if (propertyInfo.PropertyType == typeof(string))
+                            {
+                                if (propertyInfo.GetValue(affectObject, null) == null)
+                                {
+                                    propertyInfo.SetValue(affectObject, string.Empty, null);
+                                }
+                            }
+                        }
+                        var response = api.PostAffect(affectObject).Result;
                         if (response.StatusCode == HttpStatusCode.Created)
                         {
                             var responseObject = response.Content;
@@ -174,20 +213,30 @@ namespace DataManager
 
                         }
                     }
-                    else if (jObject["Message"]["Behaviour"] != null)
+                    if (jObject["Message"]["Behaviour"] != null)
                     {
                         restMessage = (JObject)jObject.SelectToken("Message.Behaviour");
                         BehaviourObject behaviourObject = restMessage.ToObject<BehaviourObject>();
                         behaviourObject.ObservationID = observation_ID;
-                        string message = JsonConvert.SerializeObject(behaviourObject,
+                        /*string message = JsonConvert.SerializeObject(behaviourObject,
                                                     Newtonsoft.Json.Formatting.None,
                                                     new JsonSerializerSettings
                                                     {
                                                         NullValueHandling = NullValueHandling.Ignore,
                                                         MissingMemberHandling = MissingMemberHandling.Ignore
                                                     });
-
-                        var response = api.PostAffect(message).Result;
+                        var response = api.PostBehaviour(message).Result;*/
+                        foreach (var propertyInfo in behaviourObject.GetType().GetProperties())
+                        {
+                            if (propertyInfo.PropertyType == typeof(string))
+                            {
+                                if (propertyInfo.GetValue(behaviourObject, null) == null)
+                                {
+                                    propertyInfo.SetValue(behaviourObject, string.Empty, null);
+                                }
+                            }
+                        }
+                        var response = api.PostBehaviour(behaviourObject).Result;
                         if (response.StatusCode == HttpStatusCode.Created)
                         {
                             var responseObject = response.Content;
@@ -197,20 +246,30 @@ namespace DataManager
 
                         }
                     }
-                    else if (jObject["Message"]["Emotion"] != null)
+                    if (jObject["Message"]["Emotion"] != null)
                     {
                         restMessage = (JObject)jObject.SelectToken("Message.Emotion");
                         EmotionObject emotionObject = restMessage.ToObject<EmotionObject>();
                         emotionObject.ObservationID = observation_ID;
-                        string message = JsonConvert.SerializeObject(emotionObject,
+                        /*string message = JsonConvert.SerializeObject(emotionObject,
                                                     Newtonsoft.Json.Formatting.None,
                                                     new JsonSerializerSettings
                                                     {
                                                         NullValueHandling = NullValueHandling.Ignore,
                                                         MissingMemberHandling = MissingMemberHandling.Ignore
                                                     });
-
-                        var response = api.PostEmotion(message).Result;
+                        var response = api.PostEmotion(message).Result;*/
+                        foreach (var propertyInfo in emotionObject.GetType().GetProperties())
+                        {
+                            if (propertyInfo.PropertyType == typeof(string))
+                            {
+                                if (propertyInfo.GetValue(emotionObject, null) == null)
+                                {
+                                    propertyInfo.SetValue(emotionObject, string.Empty, null);
+                                }
+                            }
+                        }
+                        var response = api.PostEmotion(emotionObject).Result;
                         if (response.StatusCode == HttpStatusCode.Created)
                         {
                             var responseObject = response.Content;

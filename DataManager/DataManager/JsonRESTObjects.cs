@@ -67,7 +67,7 @@ namespace DataManager
         public class ObservationObject
         {
             public string Duration { get; set; }
-            public string Date_Time { get; set; }
+            public DateTime Date_Time { get; set; }
             public string Student { get; set; }
             public string Scenario { get; set; }
             public string Session { get; set; }

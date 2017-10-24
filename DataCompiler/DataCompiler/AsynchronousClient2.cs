@@ -124,19 +124,24 @@ namespace DataCompiler
                 string msgReceived = Encoding.ASCII.GetString(byteData).TrimEnd('\0');
                 if (msgReceived.Equals("Connected"))
                 {
+                    Console.WriteLine("Connected");
                 }
                 else if (msgReceived.Contains("Start"))
                 {
+                    Console.WriteLine("Starting");
+                    Console.WriteLine(WatcherFolder);
                     FileAnaliser fileAnaliser = new FileAnaliser();
                     //fileAnaliser.client = client;
-                    fileAnaliser.FileWatcher();
+                    Task.Run(()=>fileAnaliser.FileWatcher());
                 }
                 else if (msgReceived.Equals("Stop"))
                 {
+                    Console.WriteLine("Stoping");
                     System.Windows.Forms.Application.Exit();
                 }
                 else if (msgReceived.Equals("Off"))
                 {
+                    Console.WriteLine("Off");
                     //GlobalVars.Running = true;
                     resetEvent.Set();
                     System.Environment.Exit(1);

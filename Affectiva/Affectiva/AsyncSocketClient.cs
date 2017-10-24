@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Affectiva
 {
@@ -102,21 +103,23 @@ namespace Affectiva
                 }
                 else if (msgReceived.Contains("Start"))
                 {
-                    if (Int32.TryParse(msgReceived.Split(':')[1], out int x))
+                    int x;
+                    if (Int32.TryParse(msgReceived.Split(':')[1], out x))
                     {
                         GlobalVars.SampleRate = x;
                     }
-                    videoProcess.Start();
+                    //videoProcess.Start();
+                    Task.Run(() => videoProcess.Start());
                 }
                 else if (msgReceived.Equals("Stop"))
                 {
                     videoProcess.Stop();
-                    resetEvent.Set();
                     //System.Windows.Forms.Application.Exit();
                 }
                 else if (msgReceived.Equals("Off"))
                 {
                     GlobalVars.Running = false;
+                    resetEvent.Set();
                     System.Environment.Exit(1);
                 }
 

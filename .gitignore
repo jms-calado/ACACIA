@@ -57,6 +57,9 @@ gitignore/VisualStudio.gitignore
 # Records
 Records
 
+#Student Software
+Student Software
+
 # User-specific files
 *.suo
 *.user

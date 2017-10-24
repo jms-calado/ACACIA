@@ -31,12 +31,12 @@ namespace DataManager
         Task<Response<ResponseObject>> PostObservation([Body] ObservationObject observationObject);
 
         [Post("insert/affect")]
-        Task<HttpResponseMessage> PostAffect([Body] String affectObject);
+        Task<HttpResponseMessage> PostAffect([Body] AffectObject affectObject);
 
         [Post("insert/behaviour")]
-        Task<HttpResponseMessage> PostBehaviour([Body] String behaviourObject);
+        Task<HttpResponseMessage> PostBehaviour([Body] BehaviourObject behaviourObject);
 
         [Post("insert/emotion")]
-        Task<HttpResponseMessage> PostEmotion([Body] String emotionObject);
+        Task<HttpResponseMessage> PostEmotion([Body] EmotionObject emotionObject);
     }
 }

@@ -53,6 +53,7 @@
             this.usernameTextBox.Name = "usernameTextBox";
             this.usernameTextBox.Size = new System.Drawing.Size(100, 20);
             this.usernameTextBox.TabIndex = 1;
+            this.usernameTextBox.Text = "Student_123";
             // 
             // label1
             // 

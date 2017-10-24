@@ -29,11 +29,11 @@ namespace GP3
 
         StreamWriter file = null;
         //string FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+        string FilePath = GlobalVars.WatcherFolder + "\\GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
         
         public ProcessGaze()
         {
-            Directory.CreateDirectory(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/");
+            Directory.CreateDirectory(GlobalVars.WatcherFolder);
             //Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "/Records/");
             Console.WriteLine("Ready.\r\nFile Creation Sample Rate: " + GlobalVars.sample_rate.ToString() + " miliseconds.");
                        
@@ -57,7 +57,7 @@ namespace GP3
             try
             {
                 gp3_client = new TcpClient(ServerAddr, ServerPort);
-                Console.WriteLine("Connected");
+                Console.WriteLine("Connected to GazePoint Control");
             }
             catch (Exception error)
             {
@@ -70,6 +70,7 @@ namespace GP3
             data_write.Close();
             gp3_client.Close();
             Console.WriteLine("Disconnected");
+            KillProc("Gazepoint");
         }
         private void ListenToTcp(CancellationTokenSource ct, IProgress<string> progress)
         {
@@ -135,7 +136,7 @@ namespace GP3
                                 file.WriteLine("</root>");
                                 file.Dispose();//?
                                 //FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "\\Records\\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-                                FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records\" + "GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                                FilePath = GlobalVars.WatcherFolder + "\\GP3 " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                                 Console.WriteLine("New file: " + FilePath);
                                 file = new StreamWriter(FilePath, true);
                                 file.AutoFlush = true;
@@ -219,6 +220,26 @@ namespace GP3
                 file.WriteLine("</root>");
                 //file.Close();
             }
+        }
+        private bool KillProc(string proc_name)
+        {
+            if (Process.GetProcesses().Any(p => p.ProcessName.Contains(proc_name)))
+            {
+                try
+                {
+                    foreach (Process proc in Process.GetProcessesByName(proc_name))
+                    {
+                        proc.Kill();
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                return false;
+            }
+            else return false;
         }
     }
 }

@@ -67,11 +67,12 @@ namespace DataManager
         }
         private void WebsocketClient_Opened(object sender, EventArgs e)
         {
-            Console.WriteLine("Client successfully connected.");
+            Console.WriteLine("Client successfully connected.");         
+            new LoginForm().ShowDialog();
             Sensor sensor = new Sensor()
             {
                 action = "add",
-                name = "username",
+                name = username,
                 type = "Student",
                 sensors = new string[] { "GP3", "Affectiva" },
                 statusOnOff = "Off",
@@ -87,8 +88,7 @@ namespace DataManager
             websocketClient.Send(message);
             Console.WriteLine("Message Sent: " + message);
             resumeEvent.Set();
-            //WSstate.connected = true;            
-            new LoginForm().ShowDialog();
+            //WSstate.connected = true;   
         }
         private void WebsocketClient_Closed(object sender, EventArgs e)
         {
@@ -105,8 +105,15 @@ namespace DataManager
         private void WebsocketClient_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
             Console.WriteLine("Message Received: " + e.Message);
-
-            JObject jObject = JObject.Parse(e.Message);
+            JObject jObject = new JObject();
+            try
+            {
+                jObject = JObject.Parse(e.Message);
+            }
+            catch (JsonReaderException err)
+            {
+                Console.WriteLine("Failed parsing websocket json: {0}", err);
+            }
             if ("onoff".Equals(jObject.SelectToken("action").ToString()))
             {
                 if ("On".Equals(jObject.SelectToken("statusOnOff").ToString()))
@@ -116,13 +123,17 @@ namespace DataManager
                     sample_rate = jObject.SelectToken("sample_rate").ToString();
                     sensory_components = jObject.SelectToken("sensory_components").ToObject<string[]>();
 
-                    //new LoginForm().ShowDialog();
                     /*
                     foreach(string proc_name in sensory_components)
                     {
                         StartProc(proc_name);
 
                     }*/
+                    //Process process = new Process();
+                    //process.StartInfo.FileName = parentFolder + "\\2.bat";
+                    //Console.WriteLine(parentFolder + "\\2.bat");
+                    //process.StartInfo.WorkingDirectory
+                    //process.Start();
 
                     Sensor sensor = new Sensor()
                     {

@@ -18,7 +18,6 @@ namespace DataManager
         [STAThread]
         static void Main()
         {
-            GlobalVars.Running = true;
             //*
             WebsocketNetClient wsclient = new WebsocketNetClient();
             wsclient.Setup(GlobalVars.WsURL, null, WebSocketVersion.Rfc6455);

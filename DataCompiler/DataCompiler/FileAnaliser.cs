@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Renci.SshNet;
+using Renci.SshNet.Sftp;
 using System;
 using System.Globalization;
 using System.IO;
@@ -20,6 +22,26 @@ namespace DataCompiler
         int Sample_count = 0;
         bool run_1 = true;//first run reading xml first REC
         XmlReader xmlfilereader;
+
+        private void SftpUpload(string filepath)
+        {
+            const string host = "acacia.red";
+            const string username = "arca";
+            const string password = "DItAtKPpL7zWPCj";
+            const string destinationDir = "/files/Session";
+
+            using (SftpClient client = new SftpClient(host, username, password))
+            {
+                client.Connect();
+                client.CreateDirectory("/Session");
+                client.ChangeDirectory(destinationDir);
+                using (FileStream filestream = new FileStream(filepath, FileMode.Open))
+                {
+                    client.BufferSize = 4 * 1024;
+                    client.UploadFile(filestream, Path.GetFileName(filepath));
+                }
+            }
+        }
         
         private void FileAnalizer(string path, string filename)
         {
@@ -124,7 +146,8 @@ namespace DataCompiler
                 while (!xmlfilereader.EOF);
                 #endregion xml
                 Attention_Result = Attention_Result / Sample_count;
-                Duration = Math.Round(Duration * 1000, 0);
+                //Duration = Math.Round(Duration * 1000, 0);
+                Duration = Math.Round(Duration, 0);
                 /*
                 data = "<info>GP3</info>\r\n"
                     + "<BEHAVIOR start=\"" + Start_Time.ToString(CultureInfo.InvariantCulture) + "\" duration=\"" + Duration.ToString(CultureInfo.InvariantCulture) + "\">\r\n"
@@ -133,9 +156,14 @@ namespace DataCompiler
                     + "</BEHAVIOR>\r\n"
                     + "EOS\r\n";
                     */
+                //convert absolute time to current time:
+                var Digi_Date_Time = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(Start_Time);
+                //convert duration from miliseconds to HH:mm:ss
+                TimeSpan Digi_Duration = TimeSpan.FromMilliseconds(Duration);
+
                 ObservationObject observation = new ObservationObject();
-                observation.Duration = Duration.ToString(CultureInfo.InvariantCulture);
-                observation.Date_Time = Start_Time.ToString(CultureInfo.InvariantCulture);
+                observation.Duration = Digi_Duration.ToString(@"hh\:mm\:ss");
+                observation.Date_Time = Digi_Date_Time.ToString("yyyy-MM-ddTHH:mm:ss");
                 observation.Sensory_Component = "GP3";
                 BehaviourObject behaviour = new BehaviourObject();
                 behaviour.On_Task = Attention_Result.ToString(CultureInfo.InvariantCulture);
@@ -298,7 +326,8 @@ namespace DataCompiler
                 Surprise = Math.Round((Surprise / Sample_count) / 100, 3);
                 Engagement = Math.Round((Engagement / Sample_count) / 100, 3);
 
-                Duration = Math.Round(Duration * 1000, 0);
+                //Duration = Math.Round(Duration * 1000, 0);
+                Duration = Math.Round(Duration, 0);
                 /*
                 data = "<info>Affectiva</info>\r\n"
                     + "<BEHAVIOR start=\"" + Start_Time.ToString(CultureInfo.InvariantCulture) + "\" duration=\"" + Duration + "\">\r\n"
@@ -317,9 +346,14 @@ namespace DataCompiler
                     + "</emotion>\r\n"
                     + "EOS\r\n";
                 */
+                //convert absolute time to current time:
+                var Digi_Date_Time = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(Start_Time);
+                //convert duration from miliseconds to HH:mm:ss
+                TimeSpan Digi_Duration = TimeSpan.FromMilliseconds(Duration);
+
                 ObservationObject observation = new ObservationObject();
-                observation.Duration = Duration.ToString(CultureInfo.InvariantCulture);
-                observation.Date_Time = Start_Time.ToString(CultureInfo.InvariantCulture);
+                observation.Duration = Digi_Duration.ToString(@"hh\:mm\:ss");
+                observation.Date_Time = Digi_Date_Time.ToString("yyyy-MM-ddTHH:mm:ss");
                 observation.Sensory_Component = "Afectiva";
                 BehaviourObject behaviour = new BehaviourObject();
                 behaviour.Engaged = Engagement.ToString(CultureInfo.InvariantCulture);
@@ -371,7 +405,9 @@ namespace DataCompiler
             */
 
             AsynchronousClient2.Send(client, data);
+            Console.WriteLine("Sent to DM: " + data);
 
+            SftpUpload(path);
             // Receive the response from the remote device.  
             //AsynchronousClient.Receive(client);
             //AsynchronousClient.receiveDone.WaitOne();
@@ -437,7 +473,7 @@ namespace DataCompiler
                 //still being written to
                 //or being processed by another thread
                 //or does not exist (has already been processed)
-                Console.WriteLine("449 - Exception {0}", err);
+                //Console.WriteLine("449 - Exception {0}", err);
                 return true;
             }
             finally

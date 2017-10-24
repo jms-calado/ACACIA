@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GP3
 {
@@ -102,11 +103,13 @@ namespace GP3
                 }
                 else if (msgReceived.Contains("Start"))
                 {
-                    if (Int32.TryParse(msgReceived.Split(':')[1], out int x))
+                    int x;
+                    if (Int32.TryParse(msgReceived.Split(':')[1], out x))
                     {
                         GlobalVars.sample_rate = x;
                     }
-                    processGaze.Start();
+                    //processGaze.Start();
+                    Task.Run(() => processGaze.Start());
                 }
                 else if (msgReceived.Equals("Stop"))
                 {

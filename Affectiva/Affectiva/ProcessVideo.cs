@@ -9,6 +9,19 @@ namespace Affectiva
 {
     public partial class ProcessVideo: Affdex.ProcessStatusListener, Affdex.ImageListener
     {
+        private float process_last_timestamp = -1.0f;
+        private float process_fps = -1.0f;
+
+        private Dictionary<int, Affdex.Face> faces { get; set; }
+        private Affdex.Detector detector { get; set; }
+
+        bool exit_state = true;
+        Stopwatch stopwatch = new Stopwatch();
+
+        StreamWriter file = null;
+        //string FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+        string FilePath = GlobalVars.WatcherFolder + "\\Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+
         public ProcessVideo()
         {
             System.Console.WriteLine("Starting Interface...");
@@ -29,7 +42,7 @@ namespace Affectiva
             detector.setImageListener(this);
             detector.setProcessStatusListener(this);
                         
-            Directory.CreateDirectory(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/");
+            Directory.CreateDirectory(GlobalVars.WatcherFolder);
             Console.WriteLine("Ready.\r\nFile Creation Sample Rate: " + GlobalVars.SampleRate.ToString() + " miliseconds.");
         }
         public void onImageCapture(Affdex.Frame frame)
@@ -107,7 +120,7 @@ namespace Affectiva
                     file.WriteLine("</emotionml>");
                     file.Dispose();//?
                     Console.WriteLine("New file created");
-                    FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                    FilePath = GlobalVars.WatcherFolder + "\\Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                     //FilePath = "C:/Users/Admin/Dropbox/ano3s1/TESE/TESTES/Programas 1.0/Records/" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                     file = new StreamWriter(FilePath, true);
                     file.AutoFlush = true;
@@ -157,20 +170,6 @@ namespace Affectiva
         {
             System.Console.WriteLine("Processing finished successfully");
         }
-
-        private float process_last_timestamp = -1.0f;
-        private float process_fps = -1.0f;
-        
-        private Dictionary<int, Affdex.Face> faces { get; set; }
-        private Affdex.Detector detector { get; set; }
-
-        bool exit_state = true;
-        Stopwatch stopwatch = new Stopwatch();
-        
-        StreamWriter file = null;
-        //string FilePath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.FullName + "/Records/" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-        string FilePath = @"C:\Users\Admin\Dropbox\ano3s1\TESE\Aplicação GIT\ACACIA\Records" + "Affectiva " + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
-
         public static double ConvertToUnixTimestamp(DateTime date)
         {
             //http://stackoverflow.com/questions/3354893/how-can-i-convert-a-datetime-to-the-number-of-seconds-since-1970
