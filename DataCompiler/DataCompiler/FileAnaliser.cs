@@ -407,7 +407,7 @@ namespace DataCompiler
             AsynchronousClient2.Send(client, data);
             Console.WriteLine("Sent to DM: " + data);
 
-            SftpUpload(path);
+            //SftpUpload(path);
             // Receive the response from the remote device.  
             //AsynchronousClient.Receive(client);
             //AsynchronousClient.receiveDone.WaitOne();
