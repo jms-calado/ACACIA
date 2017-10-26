@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Renci.SshNet;
-using Renci.SshNet.Sftp;
 using System;
 using System.Globalization;
 using System.IO;
@@ -22,26 +20,6 @@ namespace DataCompiler
         int Sample_count = 0;
         bool run_1 = true;//first run reading xml first REC
         XmlReader xmlfilereader;
-
-        private void SftpUpload(string filepath)
-        {
-            const string host = "acacia.red";
-            const string username = "arca";
-            const string password = "DItAtKPpL7zWPCj";
-            const string destinationDir = "/files/Session";
-
-            using (SftpClient client = new SftpClient(host, username, password))
-            {
-                client.Connect();
-                client.CreateDirectory("/Session");
-                client.ChangeDirectory(destinationDir);
-                using (FileStream filestream = new FileStream(filepath, FileMode.Open))
-                {
-                    client.BufferSize = 4 * 1024;
-                    client.UploadFile(filestream, Path.GetFileName(filepath));
-                }
-            }
-        }
         
         private void FileAnalizer(string path, string filename)
         {
@@ -406,8 +384,7 @@ namespace DataCompiler
 
             AsynchronousClient2.Send(client, data);
             Console.WriteLine("Sent to DM: " + data);
-
-            //SftpUpload(path);
+            
             // Receive the response from the remote device.  
             //AsynchronousClient.Receive(client);
             //AsynchronousClient.receiveDone.WaitOne();
